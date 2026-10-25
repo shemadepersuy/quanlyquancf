@@ -7,6 +7,7 @@ struct Mon {
     char DoUong[51];
     char size;
     int giaTien;
+    int soLuongTon;
     int trangThai; /* 1 = ConHang, 0 = HetHang */
 };
 
@@ -20,23 +21,26 @@ int nhapMa(struct Mon ds[], int n);
 int nhapTen(struct Mon ds[], int n);
 int nhapSize(struct Mon ds[], int n);
 int nhapGia(struct Mon ds[], int n);
+int nhapSoLuongTon(struct Mon ds[], int n);
 int nhapTrangThai(struct Mon ds[], int n);
 int themMon(struct Mon ds[], int n);
 void hienThiDanhSach(struct Mon ds[], int n);
 void timMon(struct Mon ds[], int n);
 int capNhatMon(struct Mon ds[], int n);
 int xoaMon(struct Mon ds[], int n);
+void tinhTongGiaTriTonKho(struct Mon ds[], int n);
+void sapXepTheoGia(struct Mon ds[], int n);
 void hienThiMenu(void);
 
 /* HAM MAIN */
 int main(void) {
     /* Mang du lieu Mockdata */
     struct Mon danhSach[MAX_DOUONG] = {
-        {"CF01", "Ca phe den", 'S', 20000, 1},
-        {"CF02", "Ca phe sua", 'M', 30000, 1},
-        {"TS01", "Tra sua tran chau", 'L', 40000, 1},
-        {"TE01", "Tra dao", 'M', 35000, 0},
-        {"NC01", "Nuoc cam", 'L', 45000, 1}
+        {"CF01", "Ca phe den", 'S', 20000, 20, 1},
+        {"CF02", "Ca phe sua", 'M', 30000, 15, 1},
+        {"TS01", "Tra sua tran chau", 'L', 40000, 10, 1},
+        {"TE01", "Tra dao", 'M', 35000, 0, 0},
+        {"NC01", "Nuoc cam", 'L', 45000, 8, 1}
     };
     int soLuong = 5;
 
@@ -48,7 +52,7 @@ int main(void) {
         if (ketQua == EOF) return 0;
         xoaDongNhap();
         if (ketQua != 1) {
-            printf("Hay nhap so tu 0 den 5.\n");
+            printf("Hay nhap so tu 0 den 7.\n");
             continue;
         }
         switch (luaChon) {
@@ -57,6 +61,8 @@ int main(void) {
             case 3: timMon(danhSach, soLuong); break;
             case 4: soLuong = capNhatMon(danhSach, soLuong); break;
             case 5: soLuong = xoaMon(danhSach, soLuong); break;
+            case 6: tinhTongGiaTriTonKho(danhSach, soLuong); break;
+            case 7: sapXepTheoGia(danhSach, soLuong); break;
             case 0: printf("Tam biet!\n"); return 0;
             default: printf("Lua chon khong hop le.\n");
         }
@@ -166,6 +172,22 @@ int nhapGia(struct Mon ds[], int n) {
     }
 }
 
+int nhapSoLuongTon(struct Mon ds[], int n) {
+    int soLuong;
+    int ketQua;
+    while (1) {
+        printf("So luong ton: ");
+        ketQua = scanf("%d", &soLuong);
+        if (ketQua == EOF) return 0;
+        xoaDongNhap();
+        if (ketQua == 1 && soLuong >= 0) {
+            ds[n].soLuongTon = soLuong;
+            return 1;
+        }
+        printf("Hay nhap so nguyen khong am.\n");
+    }
+}
+
 int nhapTrangThai(struct Mon ds[], int n) {
     int trangThai;
     int ketQua;
@@ -194,6 +216,7 @@ int themMon(struct Mon ds[], int n) {
     if (nhapTen(ds, n) == 0) return n;
     if (nhapSize(ds, n) == 0) return n;
     if (nhapGia(ds, n) == 0) return n;
+    if (nhapSoLuongTon(ds, n) == 0) return n;
     if (nhapTrangThai(ds, n) == 0) return n;
 
     printf("Them mon thanh cong!\n");
@@ -202,17 +225,17 @@ int themMon(struct Mon ds[], int n) {
 
 void hienThiDanhSach(struct Mon ds[], int n) {
     int i;
-    printf("\n%-15s | %-50s | %-4s | %10s | %-10s\n",
-           "Ma mon", "Ten mon", "Size", "Gia (VND)", "Trang thai");
-    for (i = 0; i < 104; i++) {
+    printf("\n%-15s | %-50s | %-4s | %10s | %10s | %-10s\n",
+           "Ma mon", "Ten mon", "Size", "Gia (VND)", "So luong", "Trang thai");
+    for (i = 0; i < 120; i++) {
         printf("-");
     }
     printf("\n");
 
     for (i = 0; i < n; i++) {
-        printf("%-15s | %-50s | %-4c | %10d | ",
+        printf("%-15s | %-50s | %-4c | %10d | %10d | ",
                ds[i].maDoUong, ds[i].DoUong,
-               ds[i].size, ds[i].giaTien);
+               ds[i].size, ds[i].giaTien, ds[i].soLuongTon);
         if (ds[i].trangThai == 1) {
             printf("ConHang\n");
         } else {
@@ -232,10 +255,10 @@ void timMon(struct Mon ds[], int n) {
         if (strcmp(ds[i].maDoUong, tuKhoa) == 0 ||
             strstr(ds[i].DoUong, tuKhoa) != NULL) {
             if (!timThay)
-                printf("\n%-15s | %-50s | %-4s | %10s | %-10s\n",
-                       "Ma mon", "Ten mon", "Size", "Gia (VND)", "Trang thai");
-            printf("%-15s | %-50s | %-4c | %10d | %s\n",
-                   ds[i].maDoUong, ds[i].DoUong, ds[i].size, ds[i].giaTien,
+                printf("\n%-15s | %-50s | %-4s | %10s | %10s | %-10s\n",
+                       "Ma mon", "Ten mon", "Size", "Gia (VND)", "So luong", "Trang thai");
+            printf("%-15s | %-50s | %-4c | %10d | %10d | %s\n",
+                   ds[i].maDoUong, ds[i].DoUong, ds[i].size, ds[i].giaTien, ds[i].soLuongTon,
                    ds[i].trangThai == 1 ? "ConHang" : "HetHang");
             timThay = 1;
         }
@@ -245,7 +268,7 @@ void timMon(struct Mon ds[], int n) {
 
 int capNhatMon(struct Mon ds[], int n) {
     char ma[16], tenMoi[51], sizeNhap[10];
-    int i, viTri = -1, gia, trangThai, ketQua;
+    int i, viTri = -1, gia, soLuongTon, trangThai, ketQua;
     printf("Nhap ma do uong can cap nhat: ");
     if (scanf("%15s", ma) != 1) return n;
     xoaDongNhap();
@@ -275,6 +298,14 @@ int capNhatMon(struct Mon ds[], int n) {
         printf("Hay nhap so nguyen khong am.\n");
     }
     while (1) {
+        printf("So luong ton moi: ");
+        ketQua = scanf("%d", &soLuongTon);
+        if (ketQua == EOF) return n;
+        xoaDongNhap();
+        if (ketQua == 1 && soLuongTon >= 0) break;
+        printf("Hay nhap so nguyen khong am.\n");
+    }
+    while (1) {
         printf("Trang thai moi (1 = ConHang, 0 = HetHang): ");
         ketQua = scanf("%d", &trangThai);
         if (ketQua == EOF) return n;
@@ -285,6 +316,7 @@ int capNhatMon(struct Mon ds[], int n) {
     strcpy(ds[viTri].DoUong, tenMoi);
     ds[viTri].size = sizeNhap[0];
     ds[viTri].giaTien = gia;
+    ds[viTri].soLuongTon = soLuongTon;
     ds[viTri].trangThai = trangThai;
     printf("Cap nhat do uong thanh cong!\n");
     return n;
@@ -307,6 +339,31 @@ int xoaMon(struct Mon ds[], int n) {
     return n - 1;
 }
 
+void tinhTongGiaTriTonKho(struct Mon ds[], int n) {
+    int i;
+    long long tongGiaTri = 0;
+    for (i = 0; i < n; i++) {
+        tongGiaTri += (long long)ds[i].giaTien * ds[i].soLuongTon;
+    }
+    printf("Tong gia tri ton kho: %lld VND\n", tongGiaTri);
+}
+
+void sapXepTheoGia(struct Mon ds[], int n) {
+    int i, j;
+    struct Mon tam;
+    for (i = 0; i < n - 1; i++) {
+        for (j = i + 1; j < n; j++) {
+            if (ds[i].giaTien > ds[j].giaTien) {
+                tam = ds[i];
+                ds[i] = ds[j];
+                ds[j] = tam;
+            }
+        }
+    }
+    printf("Da sap xep danh sach theo gia tang dan.\n");
+    hienThiDanhSach(ds, n);
+}
+
 void hienThiMenu(void) {
     printf("\n===== QUAN LY QUAN CAFE =====\n");
     printf("1. Hien thi danh sach\n");
@@ -314,6 +371,8 @@ void hienThiMenu(void) {
     printf("3. Tim do uong\n");
     printf("4. Cap nhat do uong\n");
     printf("5. Xoa san pham\n");
+    printf("6. Tinh tong gia tri ton kho\n");
+    printf("7. Sap xep do uong theo gia\n");
     printf("0. Thoat\n");
     printf("Lua chon: ");
 }
